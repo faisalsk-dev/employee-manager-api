@@ -26,6 +26,10 @@ namespace EmployeeManager.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(Employee employee)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
@@ -34,6 +38,10 @@ namespace EmployeeManager.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(int id, Employee updatedEmployee)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (id != updatedEmployee.Id)
             {
                 return BadRequest("Employee ID mismatch.");
