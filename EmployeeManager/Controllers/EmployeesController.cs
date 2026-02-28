@@ -2,6 +2,7 @@
 using EmployeeManager.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManager.Api.Models;
+using EmployeeManager.Api.DTOs;
 
 namespace EmployeeManager.Api.Controllers
 {
@@ -19,19 +20,37 @@ namespace EmployeeManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEmployees()
         {
-            var employees = await _context.Employees.ToListAsync();
+            var employees = await _context.Employees
+                .Select(e => new EmployeeResponseDto
+                { 
+                    Id = e.Id,
+                    Name = e.Name,
+                    Department = e.Department,
+                })
+                .ToListAsync();
             return Ok(employees);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateEmployee(Employee employee)
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var employee = new Employee
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Department = dto.Department,
+                Phone = dto.Phone,
+                Address = dto.Address,
+            };
+
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
+            
             return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
         }
 
