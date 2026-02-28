@@ -22,7 +22,7 @@ namespace EmployeeManager.Api.Controllers
         {
             var employees = await _context.Employees
                 .Select(e => new EmployeeResponseDto
-                { 
+                {
                     Id = e.Id,
                     Name = e.Name,
                     Department = e.Department,
@@ -50,20 +50,16 @@ namespace EmployeeManager.Api.Controllers
 
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
-            
+
             return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, Employee updatedEmployee)
+        public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-            if (id != updatedEmployee.Id)
-            {
-                return BadRequest("Employee ID mismatch.");
             }
 
             var employee = await _context.Employees.FindAsync(id);
@@ -73,11 +69,11 @@ namespace EmployeeManager.Api.Controllers
                 return NotFound();
             }
 
-            employee.Name = updatedEmployee.Name;
-            employee.Email = updatedEmployee.Email;
-            employee.Department = updatedEmployee.Department;
-            employee.Phone = updatedEmployee.Phone;
-            employee.Address = updatedEmployee.Address;
+            employee.Name = dto.Name;
+            employee.Email = dto.Email;
+            employee.Department = dto.Department;
+            employee.Phone = dto.Phone;
+            employee.Address = dto.Address;
 
             await _context.SaveChangesAsync();
 
