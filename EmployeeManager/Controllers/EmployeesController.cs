@@ -21,6 +21,7 @@ namespace EmployeeManager.Api.Controllers
         public async Task<IActionResult> GetEmployees()
         {
             var employees = await _context.Employees
+                .Where(e => !e.IsDeleted)
                 .Select(e => new EmployeeResponseDto
                 {
                     Id = e.Id,
@@ -90,7 +91,8 @@ namespace EmployeeManager.Api.Controllers
                 return NotFound();
             }
 
-            _context.Employees.Remove(employee);
+            //_context.Employees.Remove(employee);
+            employee.IsDeleted = true;
             await _context.SaveChangesAsync();
 
             return NoContent();
