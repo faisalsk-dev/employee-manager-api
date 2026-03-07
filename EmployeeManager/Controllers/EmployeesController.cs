@@ -98,5 +98,34 @@ namespace EmployeeManager.Api.Controllers
             return NoContent();
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchEmployees(string? name, string? department)
+        {
+            var query = _context.Employees
+                .Where(e => !e.IsDeleted)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(e => e.Name.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                query = query.Where(e => e.Department.Contains(department));
+            }
+
+            var employees = await query
+                .Select(e => new EmployeeResponseDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Department = e.Department
+                })
+                .ToListAsync();
+
+            return Ok(employees);
+        }
+
     }
 }
