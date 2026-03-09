@@ -127,5 +127,28 @@ namespace EmployeeManager.Api.Controllers
             return Ok(employees);
         }
 
+        [HttpPut("restore/{id}")]
+        public async Task<IActionResult> RestoreEmployee(int id)
+        {
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            if (!employee.IsDeleted)
+            {
+                return BadRequest("Employee is not deleted.");
+            }
+
+            employee.IsDeleted = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Employee restored successfully.");
+        }
+
     }
 }
