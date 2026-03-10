@@ -18,10 +18,18 @@ namespace EmployeeManager.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees()
+        public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5)
         {
-            var employees = await _context.Employees
-                .Where(e => !e.IsDeleted)
+            if (pageSize > 50)
+            {
+                pageSize = 50;
+            }
+            var query = _context.Employees
+                .Where(e => !e.IsDeleted);
+
+            var employees = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(e => new EmployeeResponseDto
                 {
                     Id = e.Id,
@@ -29,6 +37,7 @@ namespace EmployeeManager.Api.Controllers
                     Department = e.Department,
                 })
                 .ToListAsync();
+
             return Ok(employees);
         }
 
