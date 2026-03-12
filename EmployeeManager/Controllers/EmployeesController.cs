@@ -3,6 +3,7 @@ using EmployeeManager.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using EmployeeManager.Api.Models;
 using EmployeeManager.Api.DTOs;
+using EmployeeManager.Services;
 
 namespace EmployeeManager.Api.Controllers
 {
@@ -11,32 +12,17 @@ namespace EmployeeManager.Api.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly EmployeeService _employeeService;
 
-        public EmployeesController(AppDbContext context)
+        public EmployeesController(EmployeeService employeeService)
         {
-            _context = context;
+            _employeeService = employeeService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5)
         {
-            if (pageSize > 50)
-            {
-                pageSize = 50;
-            }
-            var query = _context.Employees
-                .Where(e => !e.IsDeleted);
-
-            var employees = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(e => new EmployeeResponseDto
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Department = e.Department,
-                })
-                .ToListAsync();
+            var employees = await _employeeService.GetEmployees(page, pageSize);
 
             return Ok(employees);
         }
