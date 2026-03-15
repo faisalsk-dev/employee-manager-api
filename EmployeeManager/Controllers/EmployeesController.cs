@@ -22,9 +22,9 @@ namespace EmployeeManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5)
         {
-            var employees = await _employeeService.GetEmployees(page, pageSize);
+            var results = await _employeeService.GetEmployees(page, pageSize);
 
-            return Ok(employees);
+            return Ok(results);
         }
 
         [HttpPost]

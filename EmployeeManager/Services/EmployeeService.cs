@@ -1,5 +1,6 @@
 ﻿using EmployeeManager.Api.Data;
 using EmployeeManager.Api.DTOs;
+using EmployeeManager.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManager.Services
@@ -13,10 +14,12 @@ namespace EmployeeManager.Services
             _context = context;
         }
 
-        public async Task<List<EmployeeResponseDto>> GetEmployees(int page, int pageSize)
+        public async Task<PagedResult<EmployeeResponseDto>> GetEmployees(int page, int pageSize)
         {
             var query = _context.Employees
                 .Where(e => !e.IsDeleted);
+
+            var totalRecords = await query.CountAsync();
 
             var employees = await query
                 .Skip((page - 1) * pageSize)
@@ -29,7 +32,16 @@ namespace EmployeeManager.Services
                 })
                 .ToListAsync();
 
-            return employees;
+            var result = new PagedResult<EmployeeResponseDto>
+            {
+                Data = employees,
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+            };
+
+            return result;
         }
     }
 }
