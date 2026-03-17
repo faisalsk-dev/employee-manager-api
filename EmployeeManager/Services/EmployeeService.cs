@@ -14,10 +14,27 @@ namespace EmployeeManager.Services
             _context = context;
         }
 
-        public async Task<PagedResult<EmployeeResponseDto>> GetEmployees(int page, int pageSize)
+        public async Task<PagedResult<EmployeeResponseDto>> GetEmployees(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc")
         {
             var query = _context.Employees
                 .Where(e => !e.IsDeleted);
+
+            // Sorting logic
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.ToLower() == "name")
+                {
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(e => e.Name)
+                        : query.OrderBy(e => e.Name);
+                }
+                else if (sortBy.ToLower() == "department")
+                {
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(e => e.Department)
+                        : query.OrderBy(e => e.Department);
+                }
+            }
 
             var totalRecords = await query.CountAsync();
 
