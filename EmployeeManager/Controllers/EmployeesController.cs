@@ -23,7 +23,11 @@ namespace EmployeeManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5, string? sortBy = null, string? sortOrder = "asc")
         {
-            var results = await _employeeService.GetEmployees(page, pageSize);
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Page and pageSize must be greater than 0.");
+            }
+            var results = await _employeeService.GetEmployees(page, pageSize, sortBy, sortOrder);
 
             return Ok(results);
         }

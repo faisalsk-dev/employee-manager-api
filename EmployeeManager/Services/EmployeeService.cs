@@ -19,6 +19,13 @@ namespace EmployeeManager.Services
             var query = _context.Employees
                 .Where(e => !e.IsDeleted);
 
+            var allowedSortFields = new[] { "name", "department" };
+
+            if (!string.IsNullOrEmpty(sortBy) && !allowedSortFields.Contains(sortBy.ToLower()))
+            {
+                throw new Exception("Invalid sort field");
+            }
+
             // Sorting logic
             if (!string.IsNullOrEmpty(sortBy))
             {
