@@ -1,5 +1,6 @@
 ﻿using EmployeeManager.Api.Data;
 using EmployeeManager.Api.DTOs;
+using EmployeeManager.Exceptions;
 using EmployeeManager.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,7 @@ namespace EmployeeManager.Services
 
             if (!string.IsNullOrEmpty(sortBy) && !allowedSortFields.Contains(sortBy.ToLower()))
             {
-                throw new Exception("Invalid sort field");
+                throw new BadRequestException("Invalid sort field");
             }
 
             // Sorting logic
