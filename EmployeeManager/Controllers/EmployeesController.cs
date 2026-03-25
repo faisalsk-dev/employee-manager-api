@@ -5,6 +5,7 @@ using EmployeeManager.Api.Models;
 using EmployeeManager.Api.DTOs;
 using EmployeeManager.Services;
 using System.Runtime.CompilerServices;
+using EmployeeManager.Models;
 
 namespace EmployeeManager.Api.Controllers
 {
@@ -29,7 +30,14 @@ namespace EmployeeManager.Api.Controllers
             }
             var results = await _employeeService.GetEmployees(page, pageSize, sortBy, sortOrder);
 
-            return Ok(results);
+            var response = new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Employees fetched successfully",
+                Data = results
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
