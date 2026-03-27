@@ -68,5 +68,24 @@ namespace EmployeeManager.Services
 
             return result;
         }
+        public async Task<EmployeeResponseDto> GetEmployeeById(int id)
+        {
+            var employee = await _context.Employees
+                .Where(e => !e.IsDeleted && e.Id == id)
+                .Select(e => new EmployeeResponseDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Department = e.Department
+                })
+                .FirstOrDefaultAsync();
+
+            if (employee == null)
+            {
+                throw new NotFoundException("Employee not found");
+            }
+
+            return employee;
+        }
     }
 }

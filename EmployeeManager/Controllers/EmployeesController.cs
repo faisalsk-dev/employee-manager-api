@@ -39,6 +39,20 @@ namespace EmployeeManager.Api.Controllers
 
             return Ok(response);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEmployeeById(int id)
+        {
+            var employee = await _employeeService.GetEmployeeById(id);
+
+            var response = new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Employee fetched successfully",
+                Data = employee
+            };
+
+            return Ok(response);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(CreateEmployeeDto dto)

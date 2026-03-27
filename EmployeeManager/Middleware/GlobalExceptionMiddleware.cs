@@ -30,6 +30,10 @@ namespace EmployeeManager.Api.Middleware
                 {
                     statusCode = 400;
                 }
+                else if (ex is NotFoundException)
+                {
+                    statusCode = 404;
+                }
                 _logger.LogError(ex, "Unhandled exception occurred.");
                 //context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.StatusCode = statusCode;
