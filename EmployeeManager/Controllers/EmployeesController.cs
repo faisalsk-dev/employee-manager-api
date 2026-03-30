@@ -57,50 +57,66 @@ namespace EmployeeManager.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(CreateEmployeeDto dto)
         {
-            if (!ModelState.IsValid)
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            //var employee = new Employee
+            //{
+            //    Name = dto.Name,
+            //    Email = dto.Email,
+            //    Department = dto.Department,
+            //    Phone = dto.Phone,
+            //    Address = dto.Address,
+            //};
+
+            //_context.Employees.Add(employee);
+            //await _context.SaveChangesAsync();
+
+            //return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
+            var result = await _employeeService.CreateEmployee(dto);
+
+            return Ok(new ApiResponse<object>
             {
-                return BadRequest(ModelState);
-            }
-
-            var employee = new Employee
-            {
-                Name = dto.Name,
-                Email = dto.Email,
-                Department = dto.Department,
-                Phone = dto.Phone,
-                Address = dto.Address,
-            };
-
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
+                Success = true,
+                Message = "Employee created successfully",
+                Data = result
+            });
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(int id, UpdateEmployeeDto dto)
         {
-            if (!ModelState.IsValid)
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+
+            //var employee = await _context.Employees.FindAsync(id);
+
+            //if (employee == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //employee.Name = dto.Name;
+            //employee.Email = dto.Email;
+            //employee.Department = dto.Department;
+            //employee.Phone = dto.Phone;
+            //employee.Address = dto.Address;
+
+            //await _context.SaveChangesAsync();
+
+            //return NoContent();
+            var result = await _employeeService.UpdateEmployee(id, dto);
+
+            return Ok(new ApiResponse<object>
             {
-                return BadRequest(ModelState);
-            }
-
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            employee.Name = dto.Name;
-            employee.Email = dto.Email;
-            employee.Department = dto.Department;
-            employee.Phone = dto.Phone;
-            employee.Address = dto.Address;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                Success = true,
+                Message = "Employee updated successfully",
+                Data = result
+            });
         }
 
         [HttpDelete("{id}")]

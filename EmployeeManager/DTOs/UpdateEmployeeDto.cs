@@ -17,7 +17,7 @@ namespace EmployeeManager.Api.DTOs
         public string Department { get; set; }
 
         [Required]
-        [Phone]
+        //[Phone]
         public string Phone { get; set; }
 
         [Required]

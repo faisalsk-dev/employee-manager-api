@@ -1,5 +1,6 @@
 ﻿using EmployeeManager.Api.Data;
 using EmployeeManager.Api.DTOs;
+using EmployeeManager.Api.Models;
 using EmployeeManager.Exceptions;
 using EmployeeManager.Models;
 using Microsoft.EntityFrameworkCore;
@@ -87,11 +88,64 @@ namespace EmployeeManager.Services
 
             return employee;
         }
+        public async Task<EmployeeResponseDto> CreateEmployee(CreateEmployeeDto dto)
+        {
+            var employee = new Employee
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Department = dto.Department,
+                Phone = dto.Phone,
+                Address = dto.Address,
+                IsDeleted = false
+            };
+
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+            return new EmployeeResponseDto
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                Email = employee.Email,
+                Department = employee.Department,
+                Phone = employee.Phone,
+                Address = employee.Address
+
+            };
+        }
+        public async Task<EmployeeResponseDto> UpdateEmployee(int id, UpdateEmployeeDto dto)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                throw new NotFoundException("Employee not found");
+            }
+
+            employee.Name = dto.Name;
+            employee.Email = dto.Email;
+            employee.Department = dto.Department;
+            employee.Phone = dto.Phone;
+            employee.Address = dto.Address;
+
+            await _context.SaveChangesAsync();
+
+            return new EmployeeResponseDto
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                Email = employee.Email,
+                Department = employee.Department,
+                Phone = employee.Phone,
+                Address = employee.Address
+            };
+        }
         public async Task DeleteEmployee(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
 
-            if(employee == null)
+            if (employee == null)
             {
                 throw new NotFoundException("Employee not found");
             }
