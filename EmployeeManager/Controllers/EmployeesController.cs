@@ -106,18 +106,14 @@ namespace EmployeeManager.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            await _employeeService.DeleteEmployee(id);
 
-            if (employee == null)
+            return Ok(new ApiResponse<string>
             {
-                return NotFound();
-            }
-
-            //_context.Employees.Remove(employee);
-            employee.IsDeleted = true;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                Success = true,
+                Message = "Employee deleted successfully",
+                Data = null
+            });
         }
 
         [HttpGet("search")]
@@ -152,24 +148,15 @@ namespace EmployeeManager.Api.Controllers
         [HttpPut("restore/{id}")]
         public async Task<IActionResult> RestoreEmployee(int id)
         {
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(e => e.Id == id);
 
-            if (employee == null)
+            await _employeeService.RestoreEmployee(id);
+
+            return Ok(new ApiResponse<string>
             {
-                return NotFound();
-            }
-
-            if (!employee.IsDeleted)
-            {
-                return BadRequest("Employee is not deleted.");
-            }
-
-            employee.IsDeleted = false;
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Employee restored successfully.");
+                Success = true,
+                Message = "Employee restored successfully.",
+                Data = null
+            });
         }
 
     }

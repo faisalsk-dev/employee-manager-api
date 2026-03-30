@@ -87,5 +87,40 @@ namespace EmployeeManager.Services
 
             return employee;
         }
+        public async Task DeleteEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if(employee == null)
+            {
+                throw new NotFoundException("Employee not found");
+            }
+            if (employee.IsDeleted)
+            {
+                throw new BadRequestException("Employee already deleted");
+            }
+
+            employee.IsDeleted = true;
+
+            await _context.SaveChangesAsync();
+        }
+        public async Task RestoreEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                throw new NotFoundException("Employee not found");
+            }
+
+            if (!employee.IsDeleted)
+            {
+                throw new BadRequestException("Employee is not deleted");
+            }
+
+            employee.IsDeleted = false;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
