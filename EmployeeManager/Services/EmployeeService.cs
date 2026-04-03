@@ -4,10 +4,11 @@ using EmployeeManager.Api.Models;
 using EmployeeManager.Exceptions;
 using EmployeeManager.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace EmployeeManager.Services
 {
-    public class EmployeeService
+    public class EmployeeService : IEmployeeService
     {
         private readonly AppDbContext _context;
 
@@ -16,10 +17,20 @@ namespace EmployeeManager.Services
             _context = context;
         }
 
-        public async Task<PagedResult<EmployeeResponseDto>> GetEmployees(int page, int pageSize, string? sortBy = null, string? sortOrder = "asc")
+        public async Task<PagedResult<EmployeeResponseDto>> GetEmployees(int page, int pageSize, string? name, string? department, string? sortBy = null, string? sortOrder = "asc")
         {
             var query = _context.Employees
                 .Where(e => !e.IsDeleted);
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(e => e.Name.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                query = query.Where(e => e.Department.Contains(department));
+            }
 
             var allowedSortFields = new[] { "name", "department" };
 

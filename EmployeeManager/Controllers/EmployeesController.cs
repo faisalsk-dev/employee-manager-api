@@ -14,26 +14,26 @@ namespace EmployeeManager.Api.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly EmployeeService _employeeService;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeesController(EmployeeService employeeService)
+        public EmployeesController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5, string? sortBy = null, string? sortOrder = "asc")
+        public async Task<IActionResult> GetEmployees(int page = 1, int pageSize = 5, string? name = null, string? department = null, string? sortBy = null, string? sortOrder = "asc")
         {
             if (page < 1 || pageSize < 1)
             {
                 return BadRequest("Page and pageSize must be greater than 0.");
             }
-            var results = await _employeeService.GetEmployees(page, pageSize, sortBy, sortOrder);
+            var results = await _employeeService.GetEmployees(page, pageSize, name, department, sortBy, sortOrder);
 
             var response = new ApiResponse<object>
             {
                 Success = true,
-                Message = "Employees fetched successfully",
+                Message = results.TotalRecords == 0? "No employees found" : "Employees fetched successfully",
                 Data = results
             };
 
