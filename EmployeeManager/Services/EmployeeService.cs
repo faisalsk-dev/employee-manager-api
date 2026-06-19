@@ -3,7 +3,9 @@ using EmployeeManager.Api.DTOs;
 using EmployeeManager.Api.Models;
 using EmployeeManager.Exceptions;
 using EmployeeManager.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
 namespace EmployeeManager.Services
@@ -65,7 +67,10 @@ namespace EmployeeManager.Services
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    Department = e.Department
+                    Email = e.Email,
+                    Department = e.Department,
+                    Phone = e.Phone,
+                    Address = e.Address
                 })
                 .ToListAsync();
 
@@ -101,6 +106,11 @@ namespace EmployeeManager.Services
         }
         public async Task<EmployeeResponseDto> CreateEmployee(CreateEmployeeDto dto)
         {
+            var existingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == dto.Email);
+            if (existingEmployee != null)
+            {
+                throw new BadRequestException("Email already exist");
+            }
             var employee = new Employee
             {
                 Name = dto.Name,
@@ -127,11 +137,17 @@ namespace EmployeeManager.Services
         }
         public async Task<EmployeeResponseDto> UpdateEmployee(int id, UpdateEmployeeDto dto)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (employee == null)
             {
                 throw new NotFoundException("Employee not found");
+            }
+
+            var existingEmailEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == dto.Email && e.Id != id);
+            if (existingEmailEmployee == null)
+            {
+                throw new NotFoundException("Email already exist");
             }
 
             employee.Name = dto.Name;
