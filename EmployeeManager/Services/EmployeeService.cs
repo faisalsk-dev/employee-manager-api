@@ -137,17 +137,17 @@ namespace EmployeeManager.Services
         }
         public async Task<EmployeeResponseDto> UpdateEmployee(int id, UpdateEmployeeDto dto)
         {
+            var existingEmailEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == dto.Email && e.Id != id);
+            if (existingEmailEmployee == null)
+            {
+                throw new NotFoundException("Email already exist");
+            }
+
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (employee == null)
             {
                 throw new NotFoundException("Employee not found");
-            }
-
-            var existingEmailEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == dto.Email && e.Id != id);
-            if (existingEmailEmployee == null)
-            {
-                throw new NotFoundException("Email already exist");
             }
 
             employee.Name = dto.Name;
