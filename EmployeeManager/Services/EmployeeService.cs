@@ -24,45 +24,15 @@ namespace EmployeeManager.Services
             var query = _context.Employees
                 .Where(e => !e.IsDeleted);
 
-            if (!string.IsNullOrEmpty(name))
-            {
-                query = query.Where(e => e.Name.Contains(name));
-            }
+            query = FilterEmployees(query, name, department);
 
-            if (!string.IsNullOrEmpty(department))
-            {
-                query = query.Where(e => e.Department.Contains(department));
-            }
-
-            var allowedSortFields = new[] { "name", "department" };
-
-            if (!string.IsNullOrEmpty(sortBy) && !allowedSortFields.Contains(sortBy.ToLower()))
-            {
-                throw new BadRequestException("Invalid sort field");
-            }
-
-            // Sorting logic
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                if (sortBy.ToLower() == "name")
-                {
-                    query = sortOrder == "desc"
-                        ? query.OrderByDescending(e => e.Name)
-                        : query.OrderBy(e => e.Name);
-                }
-                else if (sortBy.ToLower() == "department")
-                {
-                    query = sortOrder == "desc"
-                        ? query.OrderByDescending(e => e.Department)
-                        : query.OrderBy(e => e.Department);
-                }
-            }
+            query = SortEmployees(query, sortBy, sortOrder);
 
             var totalRecords = await query.CountAsync();
 
+            query = PaginateEmployees(query, page, pageSize);
+
             var employees = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .Select(e => new EmployeeResponseDto
                 {
                     Id = e.Id,
@@ -203,5 +173,52 @@ namespace EmployeeManager.Services
 
             await _context.SaveChangesAsync();
         }
+        private IQueryable<Employee> FilterEmployees(IQueryable<Employee> query, string? name, string? department)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(e => e.Name.Contains(name));
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                query = query.Where(e => e.Department.Contains(department));
+            }
+            return query;
+        }
+        private IQueryable<Employee> SortEmployees(IQueryable<Employee> query, string? sortBy, string? sortOrder)
+        {
+            var allowedSortFields = new[] { "name", "department" };
+
+            if (!string.IsNullOrEmpty(sortBy) && !allowedSortFields.Contains(sortBy.ToLower()))
+            {
+                throw new BadRequestException("Invalid sort field");
+            }
+
+            // Sorting logic
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.ToLower() == "name")
+                {
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(e => e.Name)
+                        : query.OrderBy(e => e.Name);
+                }
+                else if (sortBy.ToLower() == "department")
+                {
+                    query = sortOrder == "desc"
+                        ? query.OrderByDescending(e => e.Department)
+                        : query.OrderBy(e => e.Department);
+                }
+            }
+            return query;
+        }
+        private IQueryable<Employee> PaginateEmployees(IQueryable<Employee> query, int page, int pageSize)
+        {
+            return query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+        }
+
     }
 }
